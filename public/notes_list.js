@@ -1,18 +1,25 @@
 const notesList = document.querySelector('#notes-list');
 
-function renderNotes(doc){
+function renderNotes(doc) {
     console.log(`${doc.id} => ${doc.data().description}`);
         
     let root = document.createElement('div');
-    let keyword = document.createElement('p');
     let description = document.createElement('p');
+    let keywords = document.createElement('div');
 
     root.setAttribute('data-id', doc.id);
-    keyword.textContent = doc.data().keywords[0];
     description.textContent = doc.data().description;
 
-    root.appendChild(keyword);
+    var keywordsData = doc.data().keywords;
+    var i = 0;
+    for(i = 0; i < keywordsData.length; i++) {
+        let keyword = document.createElement('span');
+        keyword.textContent = keywordsData[i];
+        keywords.appendChild(keyword);
+    }
+
     root.appendChild(description);
+    root.appendChild(keywords);
 
     notesList.appendChild(root);
 }
