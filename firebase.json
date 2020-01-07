@@ -3,7 +3,7 @@
     "rules": "database.rules.json"
   },
   "hosting": {
-    "site": "u-mentor-notes",
+    "site": "mentor-notes",
     "public": "public",
     "ignore": [
       "firebase.json",

@@ -3,77 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link href="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="editormd/css/editormd.css" />
-  <link rel="stylesheet" href="editormd/css/editormd.preview.css" />
-  <link rel="stylesheet" href="editor.md/css/editormd.min.css" />
-  <script src="https://unpkg.com/material-components-web@latest/dist/material-components-web.min.js"></script>
-  <script  type="text/javascript">
-  import {MDCTopAppBar} from '@material/top-app-bar';
-  mdc.ripple.MDCRipple.attachTo(document.querySelector('.foo-button'));
-
-  // Instantiation
-  var topAppBarElement = document.querySelector('#topAppBar');
-  var topAppBar = mdc.topAppBar.MDCTopAppBar.attachTo(topAppBarElement);
-
-  // Listen for navigation icon events
-  topAppBarElement.addEventListener('MDCTopAppBar:nav', function () {
-    // do something
-  });
-
-  </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-  <script src="editor.md/editormd.min.js"></script>
-  <script src="jquery.min.js"></script>
-  <script type="text/javascript">
-  $(function() {
-    var editor = editormd("test-editor", {
-      // width  : "100%",
-      // height : "100%",
-      // markdown: "xxxx",     // dynamic set Markdown text
-      path   : "editor.md/lib/"
-    });
-  });
-  </script>
-
+  <title>Notes</title>
+  <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-firestore.js"></script>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <header class="mdc-top-app-bar">
-    <div class="mdc-top-app-bar__row">
-      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-        <a href="#" class="material-icons mdc-top-app-bar__navigation-icon">menu</a>
-        <span class="mdc-top-app-bar__title">Title</span>
-      </section>
-      <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end" role="toolbar">
-        <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Download">file_download</a>
-        <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Print this page">print</a>
-        <a href="#" class="material-icons mdc-top-app-bar__action-item" aria-label="Bookmark this page">bookmark</a>
-      </section>
-    </div>
-  </header>
-  <main>
-    <div class="mdc-top-app-bar--fixed-adjust">
-      <div class="mdc-card headingCard" style="position: relative;">
-        <h1>Hello World!</h1>
-      </div>
-      <div>
-        <button class="foo-button mdc-button">Button</button>
-      </div>
+<h1>All Notes</h1>
+<div class="content">
+  <div id="notes-list"></div>
+</div>
 
-      <div id="test-editor">
-        <textarea style="display:none;">
-          ### Editor.md
+<script src="/__/firebase/init.js"></script>
+<script src="notes_list.js"></script>
 
-          **Editor.md**: The open source embeddable online markdown editor, based on CodeMirror & jQuery & Marked.
-        </textarea>
-      </div>
-      <div>
-        <button class="foo-button mdc-button">Button</button>
-      </div>
-
-
-    </div>
-  </main>
 </body>
 </html>
