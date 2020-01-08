@@ -1,3 +1,9 @@
+import {MDCTopAppBar} from '@material/top-app-bar';
+
+// Instantiation
+const topAppBarElement = document.querySelector('.mdc-top-app-bar');
+const topAppBar = new MDCTopAppBar(topAppBarElement);
+
 const notesList = document.querySelector('#notes-list');
 
 function renderNotes(doc) {
@@ -30,3 +36,4 @@ db.collection('notes').get().then(snapshot => {
         renderNotes(doc);
     });
 });
+

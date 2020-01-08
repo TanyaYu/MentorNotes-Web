@@ -4,7 +4,7 @@
   },
   "hosting": {
     "site": "mentor-notes",
-    "public": "public",
+    "public": "src",
     "ignore": [
       "firebase.json",
       "**/.*",
