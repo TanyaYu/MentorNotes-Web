@@ -6,7 +6,7 @@
   <title>Notes</title>
   <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
-  <link rel="stylesheet" href="../build/bundle-index.css">
+  <link rel="stylesheet" href="build/bundle-index.css">
 </head>
 <body>
 <header class="mdc-top-app-bar">
@@ -17,16 +17,45 @@
     </section>
   </div>
 </header>
-<main class="mdc-top-app-bar--fixed-adjust">
+<main class="mdc-top-app-bar--fixed-adjust container">
   <div class="content">
     <div id="notes-list"></div>
   </div>
 </main>
 
+<template id="note-template">
+<div class="mdc-card mdc-card--outlined note-card">
+  <div class="note-content">
+    <p class="note-text"></p>
+    <div class="note-actions">
+      <button class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded d-block" data-mdc-ripple-is-unbounded="true"
+        title="Copy">file_copy</button>
+      <button class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded d-block" data-mdc-ripple-is-unbounded="true"
+        title="Edit">edit</button>
+      <button class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded d-block" data-mdc-ripple-is-unbounded="true"
+        title="Delete">delete_outline</button>
+    </div>
+  </div>
+  <div class="mdc-chip-set note-keywords-chips" role="grid"></div>
+</div>
+</template>
+
+<template id="keyword-template">
+  <div class="mdc-chip" role="row">
+    <div class="mdc-chip__ripple"></div>
+    <span role="gridcell">
+      <span role="button" tabindex="0" class="mdc-chip__text"></span>
+    </span>
+    <span role="gridcell">
+      <i class="material-icons mdc-chip__icon mdc-chip__icon--trailing" tabindex="-1" role="button">cancel</i>
+    </span>
+  </div> 
+</template>
+
 <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/7.6.1/firebase-firestore.js"></script>
 <script src="/__/firebase/init.js"></script>
-<script src="../build/bundle-index.js" async></script>
+<script src="build/bundle-index.js" async></script>
 
 </body>
 </html>

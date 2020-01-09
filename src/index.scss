@@ -1,3 +1,35 @@
 @import "./common";
 @import "@material/top-app-bar/mdc-top-app-bar";
 @import "@material/icon-button/mdc-icon-button";
+@import "@material/card/mdc-card";
+@import "@material/chips/mdc-chips";
+
+.content {
+    width: 100%;
+    margin: auto;
+    max-width: 45em;
+}
+
+.note-card {
+    margin-top: 0.5em; 
+}
+
+.note-content {
+    display: flex;
+    flex-direction: row;
+}
+
+.note-text {
+    flex: 1;
+    padding: 1em 0 0 1em;
+    margin: 0;
+}
+
+.note-actions {
+    padding: 0.5em;
+    color: rgba(0, 0, 0, 0.6);
+}
+
+.note-keywords-chips {
+    padding: 0.75em;
+}
