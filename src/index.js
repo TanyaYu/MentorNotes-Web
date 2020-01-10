@@ -1,19 +1,15 @@
-import {MDCTopAppBar} from '@material/top-app-bar';
-// import {MDCRipple} from '@material/ripple';
-
-// const selector = '.mdc-button, .mdc-icon-button, .mdc-card__primary-action';
-// const ripples = [].map.call(document.querySelectorAll(selector), function(el) {
-//   return new MDCRipple(el);
-// });
-// const iconButtonRipple = new MDCRipple(document.querySelector('.mdc-icon-button'));
-// iconButtonRipple.unbounded = false;
-
-const topAppBarElement = document.querySelector('.mdc-top-app-bar');
-const topAppBar = new MDCTopAppBar(topAppBarElement);
+import {MDCDialog} from '@material/dialog';
 
 const notesList = document.querySelector('#notes-list');
-var noteTemplate = document.querySelector('#note-template');
-var keyTemplate = document.querySelector('#keyword-template');
+const noteTemplate = document.querySelector('#note-template');
+const keyTemplate = document.querySelector('#keyword-template');
+const addButton = document.querySelector('#add-button');
+const addKeywordDialog = new MDCDialog(document.querySelector('#add-keyword-dialog'));
+
+addKeywordDialog.listen('MDCDialog:opened', () => {
+  
+});
+addButton.onclick = onAddClick
 
 var db = firebase.firestore();
 db.collection('notes').get().then(snapshot => {
@@ -46,8 +42,17 @@ function renderNote(doc) {
     addKeyword.setAttribute('role', 'button');
     addKeyword.setAttribute('title', 'Add');
     addKeyword.textContent = 'add_circle';
+    addKeyword.onclick = onAddKeywordClick;
     keywords.appendChild(addKeyword);
 
     notesList.appendChild(note);
+}
+
+function onAddKeywordClick() {
+    addKeywordDialog.open();
+}
+
+function onAddClick() {
+
 }
 
