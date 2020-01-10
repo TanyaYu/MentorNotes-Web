@@ -20,14 +20,19 @@ addButton.addEventListener('click', (e) => {
 });
 
 var db = firebase.firestore();
-db.collection('notes').get().then(snapshot => {
-    snapshot.docs.forEach(doc => {
-        renderNote(doc);
+db.collection('notes').onSnapshot(snapshot => {
+    let changes = snapshot.docChanges();
+    changes.forEach(change => {
+        console.log(change.doc.data());
+        if(change.type == 'added'){
+            renderNote(change.doc);
+        } else if (change.type == 'removed'){
+            unrenderNote(change.doc);
+        }
     });
 });
 
 function renderNote(doc) {
-    console.log(`${doc.id} => ${doc.data().description}`);
     let note = noteTemplate.content.cloneNode(true);
     let card = note.querySelector(".note-card");
     let description = note.querySelector(".note-text");
@@ -53,10 +58,11 @@ function renderNote(doc) {
     var i = 0;
     for(i = 0; i < keywordsData.length; i++) {
         let keyword = keyTemplate.content.cloneNode(true);
-        let keywordText = keyword.querySelector(".mdc-chip__text");
+        let chip = keyword.querySelector(".mdc-chip");
+        let keywordText = chip.querySelector(".mdc-chip__text");
         keywordText.textContent = keywordsData[i];
-        keywordsEl.appendChild(keyword);
-        // keywords.addChip(keyword);
+        keywordsEl.appendChild(chip);
+        keywords.addChip(chip);
     }
 
     let addKeyword = document.createElement('span');
@@ -68,6 +74,11 @@ function renderNote(doc) {
     keywordsEl.appendChild(addKeyword);
 
     notesList.appendChild(note);
+}
+
+function unrenderNote(doc) {
+    let card = notesList.querySelector('[data-id=' + doc.id + ']');
+    notesList.removeChild(card);
 }
 
 function onAddKeywordClick() {
