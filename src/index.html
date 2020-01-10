@@ -58,8 +58,11 @@
     <div class="note-actions">
       <button class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded d-block" data-mdc-ripple-is-unbounded="true"
         title="Copy">file_copy</button>
-      <button class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded d-block" data-mdc-ripple-is-unbounded="true"
-        title="Edit">edit</button>
+      <button id="edit-button" class="mdc-icon-button mdc-card__action mdc-card__action--icon--unbounded" 
+        aria-label="Edit" aria-hidden="true" aria-pressed="false">
+        <i class="material-icons mdc-icon-button__icon mdc-icon-button__icon--on">done</i>
+        <i class="material-icons mdc-icon-button__icon">edit</i>
+      </button>
       <button class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded d-block" data-mdc-ripple-is-unbounded="true"
         title="Delete">delete_outline</button>
     </div>
