@@ -13,7 +13,11 @@ const addKeywordDialog = new MDCDialog(document.getElementById('add-keyword-dial
 addKeywordDialog.listen('MDCDialog:opened', () => {
   
 });
-addButton.onclick = onAddClick
+
+addButton.addEventListener('click', (e) => {
+    e.stopPropagation();
+    addNewNote();
+});
 
 var db = firebase.firestore();
 db.collection('notes').get().then(snapshot => {
@@ -28,11 +32,18 @@ function renderNote(doc) {
     let card = note.querySelector(".note-card");
     let description = note.querySelector(".note-text");
     let keywordsEl = note.querySelector(".note-keywords-chips");
-    let edit = new MDCIconButtonToggle(note.getElementById('edit-button'));
+    let editBtn = new MDCIconButtonToggle(note.getElementById('edit-button'));
+    let deleteBtn = note.getElementById('delete-button');
     let keywords = new MDCChipSet(keywordsEl);
 
     card.setAttribute('data-id', doc.id);
     description.textContent = doc.data().description;
+
+    deleteBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        let id = e.target.closest('.note-card').getAttribute('data-id');
+        deleteNote(id);
+    });
 
     keywords.listen('MDCChip:removal', function(event) {
         keywordsEl.removeChild(event.detail.root);
@@ -63,6 +74,14 @@ function onAddKeywordClick() {
     addKeywordDialog.open();
 }
 
-function onAddClick() {
+function addNewNote() {
+    db.collection('notes').add({
+        description: 'This is test note',
+        keywords: ['test'],
+        date_created: new Date()
+    });
+}
 
+function deleteNote(id) {
+    db.collection('notes').doc(id).delete();
 }
