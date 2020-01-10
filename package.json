@@ -24,6 +24,7 @@
     "@material/chips": "^4.0.0",
     "@material/density": "^4.0.0",
     "@material/elevation": "^4.0.0",
+    "@material/fab": "^4.0.0",
     "@material/icon-button": "^4.0.0",
     "@material/ripple": "^4.0.0",
     "@material/rtl": "^4.0.0",

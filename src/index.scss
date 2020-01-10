@@ -3,6 +3,7 @@
 @import "@material/icon-button/mdc-icon-button";
 @import "@material/card/mdc-card";
 @import "@material/chips/mdc-chips";
+@import "@material/fab/mdc-fab";
 
 .content {
     width: 100%;
@@ -43,4 +44,17 @@
     color: rgba(0, 0, 0, 0.6);
     box-sizing: content-box;
     text-align: center;
+}
+
+.app-fab--absolute {
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+}
+
+@media(min-width: 1024px) {
+    .app-fab--absolute {
+        bottom: 1.5rem;
+        right: 1.5rem;
+    }
 }
