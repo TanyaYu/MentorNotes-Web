@@ -4,8 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Notes</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.0/normalize.min.css">
   <link rel="stylesheet" href="build/bundle-index.css">
 </head>
 <body>
@@ -70,7 +68,10 @@
 <template id="note-template">
 <div class="mdc-card mdc-card--outlined note-card">
   <div class="note-content">
-    <p class="note-text"></p>
+    <div class="note-content-1">
+      <p class="note-text"></p>
+      <div class="mdc-chip-set note-keywords-chips" role="grid"></div>
+    </div>
     <div class="note-actions">
       <button class="mdc-icon-button material-icons mdc-card__action mdc-card__action--icon--unbounded d-block" data-mdc-ripple-is-unbounded="true"
         title="Copy">file_copy</button>
@@ -83,7 +84,6 @@
         title="Delete">delete_outline</button id="edit-button">
     </div>
   </div>
-  <div class="mdc-chip-set note-keywords-chips" role="grid"></div>
 </div>
 </template>
 
