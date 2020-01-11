@@ -1,6 +1,13 @@
+$mdc-theme-primary: #02b3e4;
+$mdc-theme-secondary: #02b3e4;
+$mdc-theme-on-primary: #ffffff;
+$mdc-theme-on-secondary: #ffffff;
+
 @import "bootstrap/scss/bootstrap";
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 @import url('https://fonts.googleapis.com/css?family=Roboto&display=swap');
+@import "@material/snackbar/mdc-snackbar";
+@import "@material/top-app-bar/mdc-top-app-bar";
 
 html, body {
   height: 100%;
@@ -10,4 +17,12 @@ body {
   font-family: 'Roboto', sans-serif;
   margin: 0;
   padding-top: 0.1px; // Prevent header h1 margin from pushing body down
+}
+
+.mdc-snackbar {
+  --mdc-snackbar-action-color: $mdc-theme-primary;
+}
+
+.mdc-top-app-bar__title {
+    color: $mdc-theme-on-primary;
 }

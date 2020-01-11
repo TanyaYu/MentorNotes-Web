@@ -16,7 +16,8 @@ var tempDeletedDoc = null;
 const adapter = new NotesAdapter(notesList, {
     onDeleteNoteClick: deleteNote,
     onRemoveKeyword: removeKeyword,
-    onAddKeywordClick: openAddKeywordDialog
+    onAddKeywordClick: openAddKeywordDialog,
+    onDescriptionSaveClick: updateDescription
 });
 
 deleteNoteConfirmation.listen('MDCSnackbar:closing', (e) => {
@@ -99,7 +100,9 @@ function addNewNote() {
         date_created: firebase.firestore.FieldValue.serverTimestamp()
     })
     .then((doc) => {
-        adapter.get(doc.id).root.scrollIntoView();
+        var view = adapter.get(doc.id);
+        view.root.scrollIntoView();
+        view.toggleDescription('edit');
     });;
 }
 
@@ -125,6 +128,13 @@ function removeKeyword(id, key) {
 function addKeyword(id, key) {
     db.collection('notes').doc(id).update({
         keywords: firebase.firestore.FieldValue.arrayUnion(key),
+        date_updated: firebase.firestore.FieldValue.serverTimestamp()
+    });
+}
+
+function updateDescription(id, newDescripton) {
+    db.collection('notes').doc(id).update({
+        description: newDescripton,
         date_updated: firebase.firestore.FieldValue.serverTimestamp()
     });
 }

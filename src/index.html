@@ -69,7 +69,17 @@
 <div class="mdc-card mdc-card--outlined note-card">
   <div class="note-content">
     <div class="note-content-1">
-      <p class="note-text"></p>
+      <div><p id="note-text-p" class="note-text"></p></div>
+      <div class="note-text">
+        <div contenteditable id="note-edit-text" class="mdc-text-field mdc-text-field--fullwidth mdc-text-field--textarea mdc-text-field--no-label">
+          <textarea class="mdc-text-field__input" aria-label="Label"></textarea>
+          <div class="mdc-notched-outline">
+            <div class="mdc-notched-outline__leading"></div>
+            <div class="mdc-notched-outline__notch"></div>
+            <div class="mdc-notched-outline__trailing"></div>
+          </div>
+        </div>
+      </div>
       <div class="mdc-chip-set note-keywords-chips" role="grid"></div>
     </div>
     <div class="note-actions">

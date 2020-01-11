@@ -1,10 +1,4 @@
-$mdc-theme-primary: #02b3e4;
-$mdc-theme-secondary: #02b3e4;
-$mdc-theme-on-primary: #ffffff;
-$mdc-theme-on-secondary: #ffffff;
-
 @import "./common";
-@import "@material/top-app-bar/mdc-top-app-bar";
 @import "@material/icon-button/mdc-icon-button";
 @import "@material/card/mdc-card";
 @import "@material/chips/mdc-chips";
@@ -13,11 +7,6 @@ $mdc-theme-on-secondary: #ffffff;
 @import "@material/button/mdc-button";
 @import "@material/textfield/mdc-text-field";
 @import "@material/textfield/helper-text/mdc-text-field-helper-text";
-@import "@material/snackbar/mdc-snackbar";
-
-.mdc-top-app-bar__title {
-    color: #ffffff;
-}
 
 .content {
     width: 100%;

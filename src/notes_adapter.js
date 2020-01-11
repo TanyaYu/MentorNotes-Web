@@ -1,5 +1,6 @@
 import { MDCIconButtonToggle } from '@material/icon-button';
 import { MDCChipSet } from '@material/chips';
+import { MDCTextField } from '@material/textfield';
 
 const noteTemplate = document.getElementById('note-template');
 const keyTemplate = document.getElementById('keyword-template');
@@ -46,15 +47,19 @@ class NoteView {
 
     render(id, data) {
         let card = noteTemplate.content.cloneNode(true).querySelector(".note-card");
-        this.description = card.querySelector(".note-text");
+        this.description = card.querySelector("#note-text-p");
         let keywordsEl = card.querySelector(".note-keywords-chips");
         this.keywordsEl = keywordsEl;
+        this.editText = new MDCTextField(card.querySelector('#note-edit-text'));
         let editBtn = new MDCIconButtonToggle(card.querySelector('#edit-button'));
+        this.editBtn = editBtn;
         let deleteBtn = card.querySelector('#delete-button');
         let keywords = new MDCChipSet(keywordsEl);
         this.keywords = keywords;
         
         this.description.textContent = data.description;
+        this.editText.value = data.description;
+        this.toggleDescription('demo');
     
         var i;
         for(i = 0; i < data.keywords.length; i++) {
@@ -68,8 +73,17 @@ class NoteView {
         keywordsEl.appendChild(addChip);
     
         keywords.listen('MDCChip:removal', function(e) {
-            let key = e.target.querySelector(".mdc-chip__text").textContent;
+            let key = e.detail.chipId;
             callback.onRemoveKeyword(id, key);
+        });
+
+        editBtn.listen('MDCIconButtonToggle:change', (e) => {
+            if(e.detail.isOn) {
+                this.toggleDescription('edit');
+            } else {
+                this.toggleDescription('demo');
+                callback.onDescriptionSaveClick(id, this.editText.value);
+            }
         });
     
         deleteBtn.addEventListener('click', (e) => {
@@ -91,7 +105,10 @@ class NoteView {
     }
 
     updateDescription(newData, oldData) {
-        this.description.textContent = newData.description;
+        if(!this.editMode) {
+            this.description.textContent = newData.description;
+            this.editText.value = newData.description;
+        }
     }
 
     updateKeywords(newData, oldData) {
@@ -109,6 +126,7 @@ class NoteView {
     renderChip(key) {
         let chip = keyTemplate.content.cloneNode(true).querySelector(".mdc-chip");
         let keywordText = chip.querySelector(".mdc-chip__text");
+        chip.id = key;
         keywordText.textContent = key;
         return chip;
     }
@@ -123,6 +141,25 @@ class NoteView {
             callback.onAddKeywordClick(id);
         });
         return addKeyword;
+    }
+
+    toggleDescription(mode) {
+        if(mode === "edit") {
+            this.editBtn.on = true;
+            this.editMode = true;
+            this.description.parentElement.style.display = "none";
+            this.editText.root_.parentElement.style.display = "block";
+            // console.log( this.description.clientHeight);
+            // this.editText.root_.querySelector('.mdc-text-field__input').style.height = this.description.clientHeight;
+            this.editText.layout();
+            this.editText.focus();
+        }
+        if(mode === "demo") {
+            this.editBtn.on = false;
+            this.editMode = false;
+            this.description.parentElement.style.display = "block";
+            this.editText.root_.parentElement.style.display = "none";
+        }
     }
     
 }
