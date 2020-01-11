@@ -2,16 +2,48 @@ import { MDCDialog } from '@material/dialog';
 import { MDCIconButtonToggle } from '@material/icon-button';
 import { MDCTopAppBar } from '@material/top-app-bar';
 import { MDCChipSet } from '@material/chips';
+import { MDCTextField } from '@material/textfield';
 
 const appBar = new MDCTopAppBar(document.querySelector('.mdc-top-app-bar'));
 const notesList = document.getElementById('notes-list');
 const noteTemplate = document.getElementById('note-template');
 const keyTemplate = document.getElementById('keyword-template');
 const addButton = document.getElementById('add-button');
+const newKeywordText = new MDCTextField(document.getElementById('new-keyword-text'));
 const addKeywordDialog = new MDCDialog(document.getElementById('add-keyword-dialog'));
+const acceptButton = document.getElementById('new-keyword-accept');
+var addKeyWordId = null;
 
 addKeywordDialog.listen('MDCDialog:opened', () => {
-  
+    addKeywordDialog.layout();
+});
+
+acceptButton.addEventListener('click', (e) => {
+    if(addKeyWordId) {
+        let newValue = newKeywordText.value;
+        if(!newValue || newValue === "") {
+            newKeywordText.valid = false;
+            newKeywordText.focus();
+        } else {
+            addKeywordDialog.close('accept');
+        }
+    }
+});
+
+addKeywordDialog.listen('MDCDialog:closing', (e) => {
+    if(e.detail.action == 'accept') {
+        addKeyWord(addKeyWordId, newKeywordText.value);
+    }
+});
+
+addKeywordDialog.listen('MDCDialog:closed', (e) => {
+    addKeyWordId = null;
+    newKeywordText.value = "";
+    newKeywordText.valid = true;
+});
+
+newKeywordText.root_.querySelector('input').addEventListener('input', (e) => {
+    newKeywordText.valid = true;
 });
 
 addButton.addEventListener('click', (e) => {
@@ -20,14 +52,14 @@ addButton.addEventListener('click', (e) => {
 });
 
 var db = firebase.firestore();
-db.collection('notes').onSnapshot(snapshot => {
+db.collection('notes').orderBy('date_created', "desc").limit(50).onSnapshot(snapshot => {
     let changes = snapshot.docChanges();
     changes.forEach(change => {
         console.log(change.doc.data());
         if(change.type == 'added'){
             renderNote(change.doc);
         } else if (change.type == 'removed'){
-            unrenderNote(change.doc);
+            removeNote(change.doc);
         }
     });
 });
@@ -46,12 +78,12 @@ function renderNote(doc) {
 
     deleteBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        let id = e.target.closest('.note-card').getAttribute('data-id');
-        deleteNote(id);
+        deleteNote(doc.id);
     });
 
-    keywords.listen('MDCChip:removal', function(event) {
-        keywordsEl.removeChild(event.detail.root);
+    keywords.listen('MDCChip:removal', function(e) {
+        let key = e.target.querySelector(".mdc-chip__text").textContent;
+        removeKeyWord(doc.id, key);
     });
 
     let keywordsData = doc.data().keywords;
@@ -70,29 +102,46 @@ function renderNote(doc) {
     addKeyword.role = 'button';
     addKeyword.title = 'Add';
     addKeyword.textContent = 'add_circle';
-    addKeyword.onclick = onAddKeywordClick;
+    addKeyword.addEventListener('click', (e) => {
+        onAddKeywordClick(doc.id);
+    });
     keywordsEl.appendChild(addKeyword);
 
     notesList.appendChild(note);
 }
 
-function unrenderNote(doc) {
+function removeNote(doc) {
     let card = notesList.querySelector('[data-id=' + doc.id + ']');
     notesList.removeChild(card);
 }
 
-function onAddKeywordClick() {
+function onAddKeywordClick(id) {
     addKeywordDialog.open();
+    addKeyWordId = id;
 }
 
 function addNewNote() {
     db.collection('notes').add({
         description: 'This is test note',
         keywords: ['test'],
-        date_created: new Date()
+        date_created: firebase.firestore.FieldValue.serverTimestamp()
     });
 }
 
 function deleteNote(id) {
     db.collection('notes').doc(id).delete();
+}
+
+function removeKeyWord(id, key) {
+    db.collection('notes').doc(id).update({
+        keywords: firebase.firestore.FieldValue.arrayRemove(key),
+        date_updated: firebase.firestore.FieldValue.serverTimestamp()
+    });
+}
+
+function addKeyWord(id, key) {
+    db.collection('notes').doc(id).update({
+        keywords: firebase.firestore.FieldValue.arrayUnion(key),
+        date_updated: firebase.firestore.FieldValue.serverTimestamp()
+    });
 }
