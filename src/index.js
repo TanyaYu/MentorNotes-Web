@@ -2,6 +2,7 @@ import { MDCDialog } from '@material/dialog';
 import { MDCTopAppBar } from '@material/top-app-bar';
 import { MDCTextField } from '@material/textfield';
 import { NotesAdapter } from './notes_adapter';
+import { MDCSnackbar } from '@material/snackbar';
 
 const appBar = new MDCTopAppBar(document.querySelector('.mdc-top-app-bar'));
 const notesList = document.getElementById('notes-list');
@@ -9,11 +10,23 @@ const addButton = document.getElementById('add-button');
 const newKeywordText = new MDCTextField(document.getElementById('new-keyword-text'));
 const addKeywordDialog = new MDCDialog(document.getElementById('add-keyword-dialog'));
 const acceptButton = document.getElementById('new-keyword-accept');
+const deleteNoteConfirmation = new MDCSnackbar(document.getElementById('delete-note-sb'));
 var addKeyWordId = null;
+var tempDeletedDoc = null;
 const adapter = new NotesAdapter(notesList, {
     onDeleteNoteClick: deleteNote,
     onRemoveKeyword: removeKeyword,
     onAddKeywordClick: openAddKeywordDialog
+});
+
+deleteNoteConfirmation.listen('MDCSnackbar:closing', (e) => {
+    console.log(e);
+    console.log(tempDeletedDoc);
+    if(e.detail.reason === "action" && tempDeletedDoc != null) {
+        var doc = tempDeletedDoc;
+        db.collection("notes").doc(doc.id).set(doc.data());
+    }
+    tempDeletedDoc = null;
 });
 
 addKeywordDialog.listen('MDCDialog:opened', () => {
@@ -23,7 +36,7 @@ addKeywordDialog.listen('MDCDialog:opened', () => {
 acceptButton.addEventListener('click', (e) => {
     if(addKeyWordId) {
         let newValue = newKeywordText.value;
-        if(!newValue || newValue === "") {
+        if(newValue == null || newValue === "") {
             newKeywordText.valid = false;
             newKeywordText.focus();
         } else {
@@ -60,14 +73,16 @@ db.collection('notes')
     .onSnapshot(snapshot => {
         snapshot.docChanges().forEach(change => {
             console.log(change.type, change.doc.data());
-            if(change.type === 'added') {
-                adapter.add(change.doc);
+            var doc = change.doc;
+            var type = change.type;
+            if (type === 'added') {
+                adapter.add(doc);
             }
-            if (change.type === 'removed') {
-                adapter.remove(change.doc);
+            if (type === 'removed') {
+                adapter.remove(doc);
             }
-            if (change.type === "modified") {
-                adapter.update(change.doc);
+            if (type === "modified") {
+                adapter.update(doc);
             }
     });
 });
@@ -86,7 +101,15 @@ function addNewNote() {
 }
 
 function deleteNote(id) {
-    db.collection('notes').doc(id).delete();
+    db.collection('notes').doc(id)
+        .get()
+        .then(doc => {
+            if (doc.exists) {
+                db.collection('notes').doc(id).delete();
+                tempDeletedDoc = doc;
+                deleteNoteConfirmation.open();
+            }
+        });
 }
 
 function removeKeyword(id, key) {
