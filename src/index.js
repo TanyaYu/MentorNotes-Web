@@ -1,18 +1,20 @@
 import { MDCDialog } from '@material/dialog';
-import { MDCIconButtonToggle } from '@material/icon-button';
 import { MDCTopAppBar } from '@material/top-app-bar';
-import { MDCChipSet } from '@material/chips';
 import { MDCTextField } from '@material/textfield';
+import { NotesAdapter } from './notes_adapter';
 
 const appBar = new MDCTopAppBar(document.querySelector('.mdc-top-app-bar'));
 const notesList = document.getElementById('notes-list');
-const noteTemplate = document.getElementById('note-template');
-const keyTemplate = document.getElementById('keyword-template');
 const addButton = document.getElementById('add-button');
 const newKeywordText = new MDCTextField(document.getElementById('new-keyword-text'));
 const addKeywordDialog = new MDCDialog(document.getElementById('add-keyword-dialog'));
 const acceptButton = document.getElementById('new-keyword-accept');
 var addKeyWordId = null;
+const adapter = new NotesAdapter(notesList, {
+    onDeleteNoteClick: deleteNote,
+    onRemoveKeyword: removeKeyword,
+    onAddKeywordClick: openAddKeywordDialog
+});
 
 addKeywordDialog.listen('MDCDialog:opened', () => {
     addKeywordDialog.layout();
@@ -32,7 +34,7 @@ acceptButton.addEventListener('click', (e) => {
 
 addKeywordDialog.listen('MDCDialog:closing', (e) => {
     if(e.detail.action == 'accept') {
-        addKeyWord(addKeyWordId, newKeywordText.value);
+        addKeyword(addKeyWordId, newKeywordText.value);
     }
 });
 
@@ -52,70 +54,25 @@ addButton.addEventListener('click', (e) => {
 });
 
 var db = firebase.firestore();
-db.collection('notes').orderBy('date_created', "desc").limit(50).onSnapshot(snapshot => {
-    let changes = snapshot.docChanges();
-    changes.forEach(change => {
-        console.log(change.doc.data());
-        if(change.type == 'added'){
-            renderNote(change.doc);
-        } else if (change.type == 'removed'){
-            removeNote(change.doc);
-        }
+db.collection('notes')
+    .orderBy('date_created', "desc")
+    .limit(50)
+    .onSnapshot(snapshot => {
+        snapshot.docChanges().forEach(change => {
+            console.log(change.type, change.doc.data());
+            if(change.type === 'added') {
+                adapter.add(change.doc);
+            }
+            if (change.type === 'removed') {
+                adapter.remove(change.doc);
+            }
+            if (change.type === "modified") {
+                adapter.update(change.doc);
+            }
     });
 });
 
-function renderNote(doc) {
-    let note = noteTemplate.content.cloneNode(true);
-    let card = note.querySelector(".note-card");
-    let description = note.querySelector(".note-text");
-    let keywordsEl = note.querySelector(".note-keywords-chips");
-    let editBtn = new MDCIconButtonToggle(note.getElementById('edit-button'));
-    let deleteBtn = note.getElementById('delete-button');
-    let keywords = new MDCChipSet(keywordsEl);
-
-    card.setAttribute('data-id', doc.id);
-    description.textContent = doc.data().description;
-
-    deleteBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        deleteNote(doc.id);
-    });
-
-    keywords.listen('MDCChip:removal', function(e) {
-        let key = e.target.querySelector(".mdc-chip__text").textContent;
-        removeKeyWord(doc.id, key);
-    });
-
-    let keywordsData = doc.data().keywords;
-    var i = 0;
-    for(i = 0; i < keywordsData.length; i++) {
-        let keyword = keyTemplate.content.cloneNode(true);
-        let chip = keyword.querySelector(".mdc-chip");
-        let keywordText = chip.querySelector(".mdc-chip__text");
-        keywordText.textContent = keywordsData[i];
-        keywordsEl.appendChild(chip);
-        keywords.addChip(chip);
-    }
-
-    let addKeyword = document.createElement('span');
-    addKeyword.classList.add('mdc-icon-button', 'material-icons', 'keyword-add');
-    addKeyword.role = 'button';
-    addKeyword.title = 'Add';
-    addKeyword.textContent = 'add_circle';
-    addKeyword.addEventListener('click', (e) => {
-        onAddKeywordClick(doc.id);
-    });
-    keywordsEl.appendChild(addKeyword);
-
-    notesList.appendChild(note);
-}
-
-function removeNote(doc) {
-    let card = notesList.querySelector('[data-id=' + doc.id + ']');
-    notesList.removeChild(card);
-}
-
-function onAddKeywordClick(id) {
+function openAddKeywordDialog(id) {
     addKeywordDialog.open();
     addKeyWordId = id;
 }
@@ -132,14 +89,14 @@ function deleteNote(id) {
     db.collection('notes').doc(id).delete();
 }
 
-function removeKeyWord(id, key) {
+function removeKeyword(id, key) {
     db.collection('notes').doc(id).update({
         keywords: firebase.firestore.FieldValue.arrayRemove(key),
         date_updated: firebase.firestore.FieldValue.serverTimestamp()
     });
 }
 
-function addKeyWord(id, key) {
+function addKeyword(id, key) {
     db.collection('notes').doc(id).update({
         keywords: firebase.firestore.FieldValue.arrayUnion(key),
         date_updated: firebase.firestore.FieldValue.serverTimestamp()
