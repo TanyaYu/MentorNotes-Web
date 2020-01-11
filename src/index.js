@@ -94,10 +94,13 @@ function openAddKeywordDialog(id) {
 
 function addNewNote() {
     db.collection('notes').add({
-        description: 'This is test note',
-        keywords: ['test'],
+        description: '',
+        keywords: [],
         date_created: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    })
+    .then((doc) => {
+        adapter.get(doc.id).root.scrollIntoView();
+    });;
 }
 
 function deleteNote(id) {

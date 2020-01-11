@@ -29,6 +29,10 @@ export class NotesAdapter {
         var view = this.views[doc.id];
         view.update(doc.data());
     }
+
+    get(id) {
+        return this.views[id];
+    }
     
 }
 
