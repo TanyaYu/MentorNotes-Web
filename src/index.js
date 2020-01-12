@@ -1,8 +1,9 @@
 import { MDCDialog } from '@material/dialog';
 import { MDCTopAppBar } from '@material/top-app-bar';
 import { MDCTextField } from '@material/textfield';
-import { NotesAdapter } from './notes_adapter';
+import { NotesAdapter } from './notes-adapter';
 import { MDCSnackbar } from '@material/snackbar';
+import * as notesData from './notes-data';
 
 const appBar = new MDCTopAppBar(document.querySelector('.mdc-top-app-bar'));
 const notesList = document.getElementById('notes-list');
@@ -13,26 +14,27 @@ const acceptButton = document.getElementById('new-keyword-accept');
 const deleteNoteConfirmation = new MDCSnackbar(document.getElementById('delete-note-sb'));
 const copyConfirmation = new MDCSnackbar(document.getElementById('copied-sb'));
 var addKeyWordId = null;
-var tempDeletedDoc = null;
 const adapter = new NotesAdapter(notesList, {
     onDeleteNoteClick: deleteNote,
-    onRemoveKeyword: removeKeyword,
+    onRemoveKeyword: notesData.removeKeyword,
     onAddKeywordClick: openAddKeywordDialog,
-    onDescriptionSaveClick: updateDescription,
+    onDescriptionSaveClick: notesData.updateDescription,
     onCopyClick: copyToClipboard
 });
+
+notesData.observe(
+    (doc) => { adapter.add(doc) },
+    (doc) => { adapter.remove(doc) },
+    (doc) => { adapter.update(doc) }
+);
 
 deleteNoteConfirmation.timeoutMs = 6000;
 copyConfirmation.timeoutMs = 4000;
 
 deleteNoteConfirmation.listen('MDCSnackbar:closing', (e) => {
-    console.log(e);
-    console.log(tempDeletedDoc);
-    if(e.detail.reason === "action" && tempDeletedDoc != null) {
-        var doc = tempDeletedDoc;
-        db.collection("notes").doc(doc.id).set(doc.data());
+    if(e.detail.reason === "action") {
+        notesData.undoDelete();
     }
-    tempDeletedDoc = null;
 });
 
 addKeywordDialog.listen('MDCDialog:opened', () => {
@@ -53,7 +55,7 @@ acceptButton.addEventListener('click', (e) => {
 
 addKeywordDialog.listen('MDCDialog:closing', (e) => {
     if(e.detail.action == 'accept') {
-        addKeyword(addKeyWordId, newKeywordText.value);
+        notesData.addKeyword(addKeyWordId, newKeywordText.value);
     }
 });
 
@@ -69,29 +71,18 @@ newKeywordText.root_.querySelector('input').addEventListener('input', (e) => {
 
 addButton.addEventListener('click', (e) => {
     e.stopPropagation();
-    addNewNote();
-});
-
-var db = firebase.firestore();
-db.collection('notes')
-    .orderBy('date_created', "desc")
-    .limit(50)
-    .onSnapshot(snapshot => {
-        snapshot.docChanges().forEach(change => {
-            console.log(change.type, change.doc.data());
-            var doc = change.doc;
-            var type = change.type;
-            if (type === 'added') {
-                adapter.add(doc);
-            }
-            if (type === 'removed') {
-                adapter.remove(doc);
-            }
-            if (type === "modified") {
-                adapter.update(doc);
-            }
+    notesData.addNewNote((doc) => {
+        var view = adapter.get(doc.id);
+        view.root.scrollIntoView();
+        view.toggleDescription('edit');
     });
 });
+
+function deleteNote(id) {
+    notesData.deleteNote(id, (doc) => {
+        deleteNoteConfirmation.open();
+    });
+}
 
 function openAddKeywordDialog(id) {
     addKeywordDialog.open();
@@ -101,50 +92,4 @@ function openAddKeywordDialog(id) {
 function copyToClipboard(id) {
     adapter.get(id).copyDescriptionToClipboard();
     copyConfirmation.open();
-}
-
-function addNewNote() {
-    db.collection('notes').add({
-        description: '',
-        keywords: [],
-        date_created: firebase.firestore.FieldValue.serverTimestamp()
-    })
-    .then((doc) => {
-        var view = adapter.get(doc.id);
-        view.root.scrollIntoView();
-        view.toggleDescription('edit');
-    });;
-}
-
-function deleteNote(id) {
-    db.collection('notes').doc(id)
-        .get()
-        .then(doc => {
-            if (doc.exists) {
-                db.collection('notes').doc(id).delete();
-                tempDeletedDoc = doc;
-                deleteNoteConfirmation.open();
-            }
-        });
-}
-
-function removeKeyword(id, key) {
-    db.collection('notes').doc(id).update({
-        keywords: firebase.firestore.FieldValue.arrayRemove(key),
-        date_updated: firebase.firestore.FieldValue.serverTimestamp()
-    });
-}
-
-function addKeyword(id, key) {
-    db.collection('notes').doc(id).update({
-        keywords: firebase.firestore.FieldValue.arrayUnion(key),
-        date_updated: firebase.firestore.FieldValue.serverTimestamp()
-    });
-}
-
-function updateDescription(id, newDescripton) {
-    db.collection('notes').doc(id).update({
-        description: newDescripton,
-        date_updated: firebase.firestore.FieldValue.serverTimestamp()
-    });
 }
