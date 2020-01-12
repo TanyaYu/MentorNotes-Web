@@ -4,6 +4,9 @@ import { MDCTextField } from '@material/textfield';
 import { NotesAdapter } from './notes-adapter';
 import { MDCSnackbar } from '@material/snackbar';
 import * as notesData from './notes-data';
+import * as auth from './auth';
+
+auth.loginRequired();
 
 const appBar = new MDCTopAppBar(document.querySelector('.mdc-top-app-bar'));
 const notesList = document.getElementById('notes-list');
