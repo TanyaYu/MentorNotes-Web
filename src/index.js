@@ -11,14 +11,19 @@ const newKeywordText = new MDCTextField(document.getElementById('new-keyword-tex
 const addKeywordDialog = new MDCDialog(document.getElementById('add-keyword-dialog'));
 const acceptButton = document.getElementById('new-keyword-accept');
 const deleteNoteConfirmation = new MDCSnackbar(document.getElementById('delete-note-sb'));
+const copyConfirmation = new MDCSnackbar(document.getElementById('copied-sb'));
 var addKeyWordId = null;
 var tempDeletedDoc = null;
 const adapter = new NotesAdapter(notesList, {
     onDeleteNoteClick: deleteNote,
     onRemoveKeyword: removeKeyword,
     onAddKeywordClick: openAddKeywordDialog,
-    onDescriptionSaveClick: updateDescription
+    onDescriptionSaveClick: updateDescription,
+    onCopyClick: copyToClipboard
 });
+
+deleteNoteConfirmation.timeoutMs = 6000;
+copyConfirmation.timeoutMs = 4000;
 
 deleteNoteConfirmation.listen('MDCSnackbar:closing', (e) => {
     console.log(e);
@@ -91,6 +96,11 @@ db.collection('notes')
 function openAddKeywordDialog(id) {
     addKeywordDialog.open();
     addKeyWordId = id;
+}
+
+function copyToClipboard(id) {
+    adapter.get(id).copyDescriptionToClipboard();
+    copyConfirmation.open();
 }
 
 function addNewNote() {

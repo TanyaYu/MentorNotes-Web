@@ -54,6 +54,7 @@ class NoteView {
         let editBtn = new MDCIconButtonToggle(card.querySelector('#edit-button'));
         this.editBtn = editBtn;
         let deleteBtn = card.querySelector('#delete-button');
+        let copyBtn = card.querySelector('#copy-button');
         let keywords = new MDCChipSet(keywordsEl);
         this.keywords = keywords;
         
@@ -89,6 +90,11 @@ class NoteView {
         deleteBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             callback.onDeleteNoteClick(id);
+        });
+
+        copyBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            callback.onCopyClick(id);
         });
     
         return card;
@@ -159,6 +165,20 @@ class NoteView {
             this.editMode = false;
             this.description.parentElement.style.display = "block";
             this.editText.root_.parentElement.style.display = "none";
+        }
+    }
+
+    copyDescriptionToClipboard() {
+        var containner = this.editText.root_.parentElement;
+        var copyText = this.editText.root_.querySelector('textarea');
+        if(containner.style.display === "none") {
+            containner.style.display = "block";
+            copyText.select();
+            document.execCommand("copy");
+            containner.style.display = "none";
+        } else {
+            copyText.select();
+            document.execCommand("copy");
         }
     }
     
