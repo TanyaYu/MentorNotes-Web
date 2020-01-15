@@ -3,10 +3,14 @@ import { MDCTopAppBar } from '@material/top-app-bar';
 import { MDCTextField } from '@material/textfield';
 import { NotesAdapter } from './notes-adapter';
 import { MDCSnackbar } from '@material/snackbar';
+import { MDCMenu } from '@material/menu';
+import { MDCList } from '@material/list';
 import * as notesData from './notes-data';
 import * as auth from './auth';
 
 const appBar = new MDCTopAppBar(document.querySelector('.mdc-top-app-bar'));
+const menu = new MDCMenu(document.getElementById('main-menu'));
+const menuList = new MDCList(document.getElementById('main-menu-list'));
 const notesList = document.getElementById('notes-list');
 const addButton = document.getElementById('add-button');
 const newKeywordText = new MDCTextField(document.getElementById('new-keyword-text'));
@@ -63,6 +67,18 @@ addKeywordDialog.listen('MDCDialog:closed', (e) => {
     addKeyWordId = null;
     newKeywordText.value = "";
     newKeywordText.valid = true;
+});
+
+appBar.listen('MDCTopAppBar:nav', () => {
+    menu.open = !menu.open;
+});
+
+menuList.listen('MDCList:action', (e) => {
+    switch(e.detail.index) {
+        case 0: 
+            auth.logout();
+            break;
+    }
 });
 
 newKeywordText.root_.querySelector('input').addEventListener('input', (e) => {
