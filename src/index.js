@@ -6,8 +6,6 @@ import { MDCSnackbar } from '@material/snackbar';
 import * as notesData from './notes-data';
 import * as auth from './auth';
 
-auth.loginRequired();
-
 const appBar = new MDCTopAppBar(document.querySelector('.mdc-top-app-bar'));
 const notesList = document.getElementById('notes-list');
 const addButton = document.getElementById('add-button');
@@ -25,10 +23,9 @@ const adapter = new NotesAdapter(notesList, {
     onCopyClick: copyToClipboard
 });
 
-notesData.observe(
-    (doc) => { adapter.add(doc) },
-    (doc) => { adapter.remove(doc) },
-    (doc) => { adapter.update(doc) }
+auth.observeCurrentUser(
+    (user) => { loadNotes() },
+    () => { window.location.href = "/login.html"; }
 );
 
 deleteNoteConfirmation.timeoutMs = 6000;
@@ -80,6 +77,14 @@ addButton.addEventListener('click', (e) => {
         view.toggleDescription('edit');
     });
 });
+
+function loadNotes() {
+    notesData.observe(
+        (doc) => { adapter.add(doc) },
+        (doc) => { adapter.remove(doc) },
+        (doc) => { adapter.update(doc) }
+    );
+}
 
 function deleteNote(id) {
     notesData.deleteNote(id, (doc) => {

@@ -1,8 +1,11 @@
+import * as auth from './auth';
+
 var db = firebase.firestore();
 var tempDeletedDoc = null;
 
 export function observe(onAdd, onRemove, onModify) {
     db.collection('notes')
+        .where("user", "==", auth.getCurrentUserUid())
         .orderBy('date_created', "desc")
         .limit(50)
         .onSnapshot(snapshot => {
@@ -25,6 +28,7 @@ export function addNewNote(callback) {
     db.collection('notes').add({
         description: '',
         keywords: [],
+        user: auth.getCurrentUserUid(),
         date_created: firebase.firestore.FieldValue.serverTimestamp()
     })
     .then((doc) => {

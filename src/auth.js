@@ -23,6 +23,16 @@ export function loginRequired() {
     });
 }
 
+export function observeCurrentUser(onUser, onEmpty) {
+  auth.onAuthStateChanged(function(user) {
+      if (user) {
+        onUser(user);
+      } else {
+        onEmpty();
+      }
+  });
+}
+
 export function getCurrentUserUid() {
     return auth.currentUser.uid;
 }
